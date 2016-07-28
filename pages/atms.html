@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>D-ATMS Demo</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+    
+    <!-- JSON support for IE (needed to use JS API) -->
+    <script type="text/javascript" src="../js/json2.min.js"></script>
+    <!-- Flash embedding utility (needed to embed Cytoscape Web) -->
+    <script type="text/javascript" src="../js/AC_OETags.min.js"></script>
+
+
+    <style>
+        /* The Cytoscape Web container must have its dimensions set. */
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link href="../dist/css/timeline.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="../bower_components/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <style>
+        .link {
+          fill: none;
+          stroke: #ccc;
+          stroke-width: 2px;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node circle {
+          fill: #fff;
+          stroke-width: 3px;
+        }
+
+        .node text {
+          font: 12px sans-serif;
+        }
+        
+
+        .center {
+            width: 80%;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #e7e7e7;
+        }
+        .navbar {
+            margin-bottom: 0px;
+        }
+        .row.vdivide [class*='col-']:not(:last-child):after {
+            background: #e0e0e0;
+            width: 1px;
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            min-height: 70px;
+        }
+        div#viewLoading {
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center" style="padding-top:6px">
+        <div id="page-wrapper " style="border-right:1px;">
+            <div class="row" style="margin: 0px; padding:0px">
+                <div class="jumbotron" style="height:130px; margin-bottom:10px; margin-right: 80px; margin-left: 80px; padding:0px;padding-top: 25px; border-radius: 5px;border:1px solid #e7e7e7;">
+
+                    <!--loading image-->
+                    <div id="viewLoading">
+                        <img src="../images/viewLoading.gif" />
+                    </div>
+
+
+                    <h3 style="font-size: 28pt;margin:0px;margin-left:50px">Distributed Interactive ATMS</h3>
+                    <h5 style="font-size: 12pt;margin: 0px;margin-left:50px;margin-right:50px">Assumption-based TMS (ATMS) is a tool that maintains the reasoning process of inference engine and supports non-monotonic reasoning.</h5>
+                </div>
+                <h1 class="page-header" style="text-align: center;margin-top: 0px;"></h1>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <!-- /.col-lg-8 -->
+                <div class="col-lg-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bell fa-fw"></i> Inference Notifications
+                            <button class="btn btn-default btn-sm" id="btn-build-rdd">Load ATMS</button>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-cogs fa-fw"></i> Inferred Triples
+                                    <span class="pull-right text-muted small"><em id="rr"></em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-circle-thin fa-fw"></i> Number of labels
+                                    <span class="pull-right text-muted small"><em id="ih"></em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-tree fa-fw"></i> Number of Environments
+                                    <span class="pull-right text-muted small"><em id="ie"></em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-tasks fa-fw"></i> Number of Assumptions
+                                    <span class="pull-right text-muted small"><em id="ia"></em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-tasks fa-fw"></i> Number of Nodes
+                                    <span class="pull-right text-muted small"><em id="in"></em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-tasks fa-fw"></i> Number of Justification
+                                    <span class="pull-right text-muted small"><em id="ij"></em>
+                                    </span>
+                                </a>
+                                <!--<div class="list-group-item" id = "info_Envirment" style="display: none;">-->
+                                   <!--<div class="list-group" style="margin-bottom : 0px">-->
+                                    <!--<i class="fa fa-th fa-fw" style=" margin-bottom : 10px;"></i> number of Environment-->
+                                      <!--<a class="list-group-item ">-->
+                                            <!--10&#9;Environment <span class="pull-right text-muted small"/><em>102 nodes</em>-->
+                                      <!--</a>-->
+                                       <!--<a class="list-group-item">-->
+                                            <!--9 &#9;Environment  <span class="pull-right text-muted small"/><em>5928 nodes</em>-->
+                                      <!--</a> -->
+                                      <!--<a class="list-group-item">-->
+                                            <!--8 &#9;Environment  <span class="pull-right text-muted small"/><em>90292 nodes</em>-->
+                                      <!--</a>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            </div>
+                            <!-- /.list-group -->
+                            <!--<a href="#" class="btn btn-default btn-block" id = "btn_viewInfo">View All Information</a>-->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+
+                    <div class="chat-panel panel panel-default">
+
+                        <div class="panel-heading" style="margin:0px;padding:6px;height:42px">
+                            <i class="fa fa-check-circle-o fa-fw" style="margin:8px"></i>Show Resources
+                            <div class="pull-right" style="width:200px;align:center;">
+                                <div class="input-group" style="margin-top:0px">
+                                    <input id="keyword" type="text" class="form-control input-sm" placeholder="input keyword" />
+                                    <span class="input-group-btn">
+                                    <button class="btn btn-default btn-sm" id="btn_show1">Show</button>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body" style="height:200px">
+                            <div id="key_resource">
+                            </div>
+
+                        </div>
+
+
+
+
+
+                        <div class="panel-heading" style="margin:0px;padding:6px;height:42px">
+                            <i class="fa fa-check-circle-o fa-fw" style="margin:8px"></i>Show Inferred Triples
+                            <div class="pull-right" style="width:200px;align:center;">
+                                <div class="input-group" style="margin-top:0px">
+                                    <input id="resourceId" type="text" class="form-control input-sm" placeholder="Input Resource ID" />
+                                    <span class="input-group-btn">
+                                    <button class="btn btn-default btn-sm" id="btn_show2">Show</button>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel-body" style="height:200px">
+                            <div id="resource_triples">
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+                <!-- /.panel -->
+                <div class="col-lg-7">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="margin:0px;padding:6px;height:42px">
+                            <i class="fa fa-bar-chart-o fa-fw" style="margin:8px"></i>Show Node Dependency as Subgraph
+                            <!--<div class="pull-right" style="width:200px;align:center;">-->
+                                <!--<div class="input-group" style="margin-top:0px">-->
+                                    <!--<input id="btn-input2" type="text" class="form-control input-sm" placeholder="Type Node Id..." />-->
+                                    <!--<span class="input-group-btn">-->
+                                    <!--<button class="btn btn-default btn-sm" id="btn-show-beliefs">Show</button>-->
+                                    <!--</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        </div>
+
+                        <!-- /.panel-heading -->
+
+                        <div id="cytoscapeweb" style="height:400px">
+                        </div>
+                        <!-- /.panel-body -->
+
+                    </div>
+
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-gear fa-fw"></i> Inferred Triple Information
+
+
+                        </div>
+                        <!-- /.panel-heading -->
+
+                        <div class="panel-body">
+                            <div class="row" style="margin: 0px; padding:0px">
+
+                                <div class="alert alert-warning" id="info">
+                                    <strong>Info : </strong> This is Info message for inferred Triple
+                                </div>
+
+                            </div>
+
+
+                            <div class="row" style="margin: 0px; padding:0px">
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <hr />
+                                        </td>
+                                        <td style="width:1px; padding: 0 10px; white-space: nowrap;">Inferred Node</td>
+                                        <td>
+                                            <hr />
+                                        </td>
+                                    </tr>
+                                </table>
+
+
+                                <div id="con">
+                                    <!--<p>This is info message displaying some information.</p>-->
+                                </div>
+
+
+
+
+
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <hr />
+                                        </td>
+                                        <td style="width:1px; padding: 0 10px; white-space: nowrap;">Assumptions</td>
+                                        <td>
+                                            <hr />
+                                        </td>
+                                    </tr>
+                                </table>
+
+
+                                <div id="ant">
+                                    <!--<p>This is info message displaying some information.</p>-->
+                                </div>
+
+                                <!--<div class="alert alert-info" style="margin-bottom: 0px">-->
+                                <!--</div>-->
+
+
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                    <!-- /.row -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#page-wrapper -->
+
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="../bower_components/raphael/raphael-min.js"></script>
+    <script src="../bower_components/morrisjs/morris.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../js/make_visual.js"></script>
+
+    <!-- about spark JavaScript -->
+    <script src="../js/sparkjs/build_atms.js"></script>
+    <script src="../js/sparkjs/keywordSearch.js"></script>
+    <script src="../js/sparkjs/resourceSearch.js"></script>
+    <script src="../js/sparkjs/spark_url_set.js"></script>
+    <script src="../js/sparkjs/context.js"></script>
+    <script src="../js/sparkjs/why.js"></script>
+    <script src="../js/sparkjs/retract.js"></script>
+
+    <!-- graph JavaScript -->
+    <script src="../js/graph/make_tree.js"></script>
+    <script src="../js/graph/show_tree.js"></script>
+
+    <script src="../js/buttonEvent.js"></script>
+
+
+
+    <script type="text/javascript">
+            $(document).ready(function(){
+
+
+
+                // make Spark Context at Start point. : param(contextName, AppName)
+                chkContext("mj-context", "atms");
+
+
+
+                $('#info').hide();
+
+                // loading image on/off
+                $('#viewLoading').hide();
+
+                $(document)
+                        .ajaxStart(function()
+                        {
+                            $('#viewLoading').fadeIn(500);
+                        })
+                        .ajaxStop(function()
+                        {
+                            $('#viewLoading').fadeOut(500);
+                        });
+
+
+
+
+
+                // when using enter, summit
+                document.getElementById("keyword").addEventListener("keypress", function(e){
+                    e.stopPropagation();
+                    if ( e.keyCode == 13){
+                        keywordSearch(getJob("SHOW_RESOURCE"), $("#keyword").val());
+                    }
+                });
+
+                document.getElementById("resourceId").addEventListener("keypress", function(e){
+                    e.preventDefault();
+                    if ( e.keyCode == 13){
+                        resourceSearch(getJob("SHOW_TRIPLES"), $("#resourceId").val());
+                    }
+                });
+
+
+
+
+
+                // clickable Events
+                $("#key_resource").on("click", "li", function () {
+                    var txt = $(this).text();
+                    var spTxt = txt.split("->");
+                    console.log(spTxt[0].trim());
+                    fillTextBox(spTxt[0].trim());
+
+                });
+
+                $("#resource_triples").on("click", "li", function () {
+                    console.log($(this).text());
+
+                    var txt = $(this).text();
+                    var spTxt = txt.split(" ");
+
+                    var nodename = spTxt[0].trim() + " " + spTxt[1].trim() + " " + spTxt[2].trim();
+                    whySearch(getJob("SHOW_WHY"), nodename);
+
+                });
+
+
+
+            });
+    </script>
+
+
+    <script>
+        $("#btn_show1").click(function () {
+            keywordSearch(getJob("SHOW_RESOURCE"), $("#keyword").val());
+        });
+
+        $("#btn_show2").click(function () {
+            resourceSearch(getJob("SHOW_TRIPLES"), $("#resourceId").val());
+        });
+
+
+        $("#btn-build-rdd").click(function () {
+            build_rdd(getJob("MAKE_ATMS_RDD"));
+        });
+
+
+
+    </script>
+
+</body>
+
+</html>
